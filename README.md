@@ -31,7 +31,28 @@ git clone https://github.com/amitsaha/optuna-demo.git
 cd optuna-demo
 ```
 
-2. Install dependencies:
+2. Create a virtual environment 
+
+Using conda:
+
+``bash
+conda create -n optuna-demo
+```
+
+Activate it:
+
+```bash
+conda activate optuna-demo
+```
+
+3. Install `pip`
+
+```bash
+conda install pip
+```
+
+``bash
+4. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```

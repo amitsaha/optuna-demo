@@ -5,7 +5,12 @@ This demo optimizes for accuracy using cross-validation.
 import optuna
 from sklearn.model_selection import cross_val_score
 from xgboost import XGBClassifier
-from data_utils import load_adult_income_data
+
+import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', )))
+from utils.data_utils import load_adult_income_data
 
 
 def objective(trial, X_train, y_train):
@@ -25,26 +30,27 @@ def objective(trial, X_train, y_train):
         'max_depth': trial.suggest_int('max_depth', 3, 10),
         'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.3, log=True),
         'n_estimators': trial.suggest_int('n_estimators', 50, 300),
-        'min_child_weight': trial.suggest_int('min_child_weight', 1, 10),
-        'gamma': trial.suggest_float('gamma', 0.0, 0.5),
-        'subsample': trial.suggest_float('subsample', 0.6, 1.0),
-        'colsample_bytree': trial.suggest_float('colsample_bytree', 0.6, 1.0),
-        'reg_alpha': trial.suggest_float('reg_alpha', 0.0, 1.0),
-        'reg_lambda': trial.suggest_float('reg_lambda', 0.0, 1.0),
         'random_state': 42,
         'eval_metric': 'logloss',
-        'use_label_encoder': False,
+        'n_jobs': 1,  # To avoid nested parallelism
     }
     
     # Create XGBoost classifier
     model = XGBClassifier(**param)
     
-    # Perform cross-validation and return mean accuracy
-    scores = cross_val_score(model, X_train, y_train, cv=3, scoring='accuracy', n_jobs=-1)
+    # Perform 3 fold cross-validation and return mean accuracy
+    # n_jobs = -1 to use all available cores
+    scores = cross_val_score(model, X_train, y_train, cv=3, scoring='accuracy', n_jobs=-1, error_score='raise')
     
-    return scores.mean()
+    # optuna tries to maximize the objective value
+    return float(scores.mean())
 
 
+# Two key concepts for optuna:
+# 1. Study - an optimization session
+# 2. Trial - a single execution of the objective function
+
+# here we run a single-objective optimization study
 def run_single_objective_optimization(n_trials=50):
     """
     Run single-objective optimization study.
@@ -83,7 +89,6 @@ def run_single_objective_optimization(n_trials=50):
     best_params.update({
         'random_state': 42,
         'eval_metric': 'logloss',
-        'use_label_encoder': False,
     })
     
     final_model = XGBClassifier(**best_params)
@@ -97,4 +102,4 @@ def run_single_objective_optimization(n_trials=50):
 
 
 if __name__ == '__main__':
-    study = run_single_objective_optimization(n_trials=50)
+    study = run_single_objective_optimization(n_trials=5)
