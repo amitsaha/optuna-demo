@@ -41,3 +41,13 @@ def load_adult_income_data(test_size=0.2, random_state=42):
     )
     
     return X_train, X_test, y_train, y_test
+
+
+# Helper function to get dataset info
+def get_dataset_info():
+    X_train, X_test, y_train, y_test = load_adult_income_data()
+    return {
+        'name': 'UCI Adult Income',
+        'n_features': X_train.shape[1],
+        'n_samples': X_train.shape[0] + X_test.shape[0]
+    }

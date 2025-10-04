@@ -7,8 +7,14 @@ from sklearn.model_selection import cross_val_score
 from xgboost import XGBClassifier
 import pandas as pd
 import plotly.graph_objects as go
-from data_utils import load_adult_income_data, get_dataset_info
 
+from single_objective_demo import objective
+
+import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', )))
+from utils.data_utils import load_adult_income_data, get_dataset_info
 
 # Set page config
 st.set_page_config(
@@ -16,53 +22,6 @@ st.set_page_config(
     page_icon="🎯",
     layout="wide"
 )
-
-
-def objective(trial, X_train, y_train, param_config):
-    """
-    Objective function for Optuna to optimize XGBoost hyperparameters.
-    
-    Args:
-        trial: Optuna trial object
-        X_train: Training features
-        y_train: Training labels
-        param_config: Dictionary with parameter ranges
-        
-    Returns:
-        float: Mean cross-validation accuracy score
-    """
-    param = {
-        'max_depth': trial.suggest_int('max_depth', 
-                                        param_config['max_depth'][0], 
-                                        param_config['max_depth'][1]),
-        'learning_rate': trial.suggest_float('learning_rate', 
-                                              param_config['learning_rate'][0], 
-                                              param_config['learning_rate'][1], 
-                                              log=True),
-        'n_estimators': trial.suggest_int('n_estimators', 
-                                           param_config['n_estimators'][0], 
-                                           param_config['n_estimators'][1]),
-        'min_child_weight': trial.suggest_int('min_child_weight', 
-                                               param_config['min_child_weight'][0], 
-                                               param_config['min_child_weight'][1]),
-        'gamma': trial.suggest_float('gamma', 
-                                      param_config['gamma'][0], 
-                                      param_config['gamma'][1]),
-        'subsample': trial.suggest_float('subsample', 
-                                          param_config['subsample'][0], 
-                                          param_config['subsample'][1]),
-        'colsample_bytree': trial.suggest_float('colsample_bytree', 
-                                                 param_config['colsample_bytree'][0], 
-                                                 param_config['colsample_bytree'][1]),
-        'random_state': 42,
-        'eval_metric': 'logloss',
-        'use_label_encoder': False,
-    }
-    
-    model = XGBClassifier(**param)
-    scores = cross_val_score(model, X_train, y_train, cv=3, scoring='accuracy', n_jobs=-1)
-    
-    return scores.mean()
 
 
 # Title and description
@@ -76,6 +35,7 @@ The goal is to maximize the classification accuracy by finding the best hyperpar
 
 # Sidebar for parameters
 st.sidebar.header("⚙️ Configuration")
+
 
 # Dataset info
 with st.sidebar.expander("📊 Dataset Information", expanded=False):
@@ -112,41 +72,13 @@ with col1:
 with col2:
     n_est_max = st.number_input("n_estimators max", value=300, min_value=100, max_value=500)
 
-col1, col2 = st.sidebar.columns(2)
-with col1:
-    mcw_min = st.number_input("min_child_weight min", value=1, min_value=1, max_value=5)
-with col2:
-    mcw_max = st.number_input("min_child_weight max", value=10, min_value=5, max_value=20)
-
-col1, col2 = st.sidebar.columns(2)
-with col1:
-    gamma_min = st.number_input("gamma min", value=0.0, min_value=0.0, max_value=0.3, format="%.2f")
-with col2:
-    gamma_max = st.number_input("gamma max", value=0.5, min_value=0.1, max_value=1.0, format="%.2f")
-
-col1, col2 = st.sidebar.columns(2)
-with col1:
-    subsample_min = st.number_input("subsample min", value=0.6, min_value=0.5, max_value=0.9, format="%.2f")
-with col2:
-    subsample_max = st.number_input("subsample max", value=1.0, min_value=0.7, max_value=1.0, format="%.2f")
-
-col1, col2 = st.sidebar.columns(2)
-with col1:
-    colsample_min = st.number_input("colsample_bytree min", value=0.6, min_value=0.5, max_value=0.9, format="%.2f")
-with col2:
-    colsample_max = st.number_input("colsample_bytree max", value=1.0, min_value=0.7, max_value=1.0, format="%.2f")
-
 # Run optimization button
 if st.sidebar.button("🚀 Run Optimization", type="primary"):
     # Create parameter configuration
     param_config = {
         'max_depth': (max_depth_min, max_depth_max),
         'learning_rate': (lr_min, lr_max),
-        'n_estimators': (n_est_min, n_est_max),
-        'min_child_weight': (mcw_min, mcw_max),
-        'gamma': (gamma_min, gamma_max),
-        'subsample': (subsample_min, subsample_max),
-        'colsample_bytree': (colsample_min, colsample_max),
+        'n_estimators': (n_est_min, n_est_max)
     }
     
     # Load data
@@ -159,7 +91,7 @@ if st.sidebar.button("🚀 Run Optimization", type="primary"):
     with st.spinner(f"Running optimization with {n_trials} trials... This may take a few minutes."):
         study = optuna.create_study(direction='maximize')
         study.optimize(
-            lambda trial: objective(trial, X_train, y_train, param_config), 
+            lambda trial: objective(trial, X_train, y_train), 
             n_trials=n_trials,
             show_progress_bar=False
         )
@@ -285,7 +217,6 @@ if 'study' in st.session_state:
                 best_params.update({
                     'random_state': 42,
                     'eval_metric': 'logloss',
-                    'use_label_encoder': False,
                 })
                 
                 final_model = XGBClassifier(**best_params)

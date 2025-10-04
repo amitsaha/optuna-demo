@@ -66,6 +66,21 @@ pip install -r requirements.txt
 python single_objective_demo.py
 ```
 
+
+#### Single-Objective Optimization App
+```bash
+streamlit run streamlit_demo.py
+```
+
+Then open your browser to the URL displayed (typically http://localhost:8501).
+
+Features:
+- Adjust hyperparameter search ranges
+- Set the number of optimization trials
+- Visualize optimization history
+- View parameter importance
+- Evaluate the best model on the test set
+
 This will run a single-objective optimization study with 50 trials, optimizing for maximum accuracy.
 
 #### Multi-Objective Optimization
@@ -77,19 +92,6 @@ This will run a multi-objective optimization study with 50 trials, finding the P
 
 ### Running Streamlit Web Apps
 
-#### Single-Objective Optimization App
-```bash
-streamlit run streamlit_single_objective.py
-```
-
-Then open your browser to the URL displayed (typically http://localhost:8501).
-
-Features:
-- Adjust hyperparameter search ranges
-- Set the number of optimization trials
-- Visualize optimization history
-- View parameter importance
-- Evaluate the best model on the test set
 
 #### Multi-Objective Optimization App
 ```bash
@@ -122,25 +124,6 @@ The following XGBoost hyperparameters are optimized:
 - `max_depth`: Maximum tree depth
 - `learning_rate`: Step size shrinkage
 - `n_estimators`: Number of boosting rounds
-- `min_child_weight`: Minimum sum of instance weight needed in a child
-- `gamma`: Minimum loss reduction required to make a split
-- `subsample`: Subsample ratio of the training instances
-- `colsample_bytree`: Subsample ratio of columns when constructing each tree
-- `reg_alpha`: L1 regularization term (for single-objective only)
-- `reg_lambda`: L2 regularization term (for single-objective only)
-
-## Project Structure
-
-```
-optuna-demo/
-├── README.md                          # This file
-├── requirements.txt                   # Python dependencies
-├── data_utils.py                      # Data loading utilities
-├── single_objective_demo.py           # Single-objective CLI demo
-├── multi_objective_demo.py            # Multi-objective CLI demo
-├── streamlit_single_objective.py      # Single-objective Streamlit app
-└── streamlit_multi_objective.py       # Multi-objective Streamlit app
-```
 
 ## Key Concepts
 
