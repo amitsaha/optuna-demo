@@ -92,6 +92,8 @@ The demos use the **UCI Adult Income** dataset, which is automatically downloade
 - **Target**: Binary classification (income >50K or ≤50K)
 - **Samples**: ~48,000
 
+**Note**: If the UCI ML Repository is unavailable, the demos will automatically use a synthetic dataset with similar characteristics for demonstration purposes.
+
 ## Hyperparameters Tuned
 
 The following XGBoost hyperparameters are optimized:
