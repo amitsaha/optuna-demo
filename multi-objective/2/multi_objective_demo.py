@@ -60,6 +60,10 @@ def objective(trial, X_train, y_train):
     val_loss = -cv_results["test_neg_log_loss"]
     # Objective 2: minimize generalization gap (val_loss - train_loss)
     mean_gap = np.mean(val_loss - train_loss)
+    # # Store train_loss and val_loss for later plotting
+    # trial.set_user_attr("train_loss", train_loss.tolist())
+    # trial.set_user_attr("val_loss", val_loss.tolist())
+    trial.set_user_attr("generalization_gap", mean_gap )
     
     return mean_acc, mean_gap
 
@@ -122,7 +126,8 @@ def run_multi_objective_optimization(n_trials=50):
         
         print(f"Selected trial: {selected_trial.number}")
         print(f"Accuracy: {selected_trial.values[0]:.4f}")
-        #print(f"Generalization gap: {selected_trial.:.0f}")
+        print(f"N_estimators: {selected_trial.values[1]:.0f}" )
+        print(f"Generalization gap: {selected_trial.user_attrs['generalization_gap']:.4f}" )
         
         # Train final model with selected parameters
         print("\nTraining final model with selected parameters...")

@@ -140,7 +140,8 @@ if 'study' in st.session_state:
             pareto_trials_data.append({
                 'Trial': trial.number,
                 'Accuracy': trial.values[0],
-                'N_Estimators': trial.values[1]
+                'N_Estimators': trial.values[1],
+                'generalization_gap': trial.user_attrs['generalization_gap']
             })
         
         df_all = pd.DataFrame(all_trials_data)
@@ -162,7 +163,7 @@ if 'study' in st.session_state:
         
         # Pareto optimal trials
         fig.add_trace(go.Scatter(
-            x=df_pareto['N_Estimators'],
+            x=df_pareto['generalization_gap'],
             y=df_pareto['Accuracy'],
             mode='markers+lines',
             name='Pareto Front',
@@ -173,8 +174,8 @@ if 'study' in st.session_state:
         ))
         
         fig.update_layout(
-            title="Pareto Frontier: Accuracy vs Model Complexity",
-            xaxis_title="Number of Estimators (Complexity)",
+            title="Pareto Frontier: Accuracy vs Generalization Gap",
+            xaxis_title="Generalization Gap",
             yaxis_title="Accuracy",
             hovermode='closest',
             height=600,
@@ -211,7 +212,7 @@ if 'study' in st.session_state:
         
         fig_history.add_trace(go.Scatter(
             x=df_all['Trial'],
-            y=df_all['N_Estimators'],
+            y=df_all['generalization_gap'],
             mode='lines+markers',
             name='N_Estimators',
             yaxis='y2',
@@ -223,7 +224,7 @@ if 'study' in st.session_state:
             title="Optimization History for Both Objectives",
             xaxis_title="Trial Number",
             yaxis=dict(title="Accuracy", side="left"),
-            yaxis2=dict(title="N_Estimators", side="right", overlaying="y"),
+            yaxis2=dict(title="Generaliztion gap", side="right", overlaying="y"),
             hovermode='x unified',
             height=500
         )
@@ -243,7 +244,8 @@ if 'study' in st.session_state:
                 'Accuracy': f"{trial.values[0]:.4f}",
                 'N_Estimators': int(trial.values[1]),
                 'max_depth': trial.params['max_depth'],
-                'learning_rate': f"{trial.params['learning_rate']:.4f}"
+                'learning_rate': f"{trial.params['learning_rate']:.4f}",
+                'generalization_gap': f"{trial.user_attrs['generalization_gap']:.4f}"
             }
             pareto_solutions.append(solution)
         
