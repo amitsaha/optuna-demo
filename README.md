@@ -94,7 +94,7 @@ python multi_objective_demo.py
 Streamlit:
 
 ```bash
-streamlit run streamlit_multi_objective.py
+streamlit run streamlit_demo.py
 ```
 
 Then open your browser to the URL displayed (typically http://localhost:8501).

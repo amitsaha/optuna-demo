@@ -107,7 +107,7 @@ def run_multi_objective_optimization(n_trials=50):
         
         print(f"Selected trial: {selected_trial.number}")
         print(f"Accuracy: {selected_trial.values[0]:.4f}")
-        print(f"N_estimators: {-selected_trial.values[1]:.0f}")
+        print(f"N_estimators: {selected_trial.values[1]:.0f}")
         
         # Train final model with selected parameters
         print("\nTraining final model with selected parameters...")
