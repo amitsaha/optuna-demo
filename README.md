@@ -35,7 +35,7 @@ cd optuna-demo
 
 Using conda:
 
-``bash
+```bash
 conda create -n optuna-demo
 ```
 
@@ -59,53 +59,46 @@ pip install -r requirements.txt
 
 ## Usage
 
-### Running Command-Line Demos
+###  Single-Objective Optimization
 
-#### Single-Objective Optimization
+```bash
+cd single-objective
+```
+
+Standalone:
+
 ```bash
 python single_objective_demo.py
 ```
 
+Streamlit:
 
-#### Single-Objective Optimization App
 ```bash
 streamlit run streamlit_demo.py
 ```
 
 Then open your browser to the URL displayed (typically http://localhost:8501).
 
-Features:
-- Adjust hyperparameter search ranges
-- Set the number of optimization trials
-- Visualize optimization history
-- View parameter importance
-- Evaluate the best model on the test set
-
-This will run a single-objective optimization study with 50 trials, optimizing for maximum accuracy.
-
 #### Multi-Objective Optimization
+
+```bash
+cd multiple-objective
+```
+
+Standalone:
+
 ```bash
 python multi_objective_demo.py
 ```
 
-This will run a multi-objective optimization study with 50 trials, finding the Pareto frontier of solutions that balance accuracy and model complexity.
+Streamlit:
 
-### Running Streamlit Web Apps
-
-
-#### Multi-Objective Optimization App
 ```bash
 streamlit run streamlit_multi_objective.py
 ```
 
 Then open your browser to the URL displayed (typically http://localhost:8501).
 
-Features:
-- Adjust hyperparameter search ranges
-- Set the number of optimization trials
-- Visualize the Pareto frontier
-- Explore optimal trade-off solutions
-- Select and evaluate specific solutions on the test set
 
 ## Dataset
 

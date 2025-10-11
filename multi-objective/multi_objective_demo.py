@@ -5,8 +5,10 @@ This demo optimizes for both accuracy and model size (number of trees).
 import optuna
 from sklearn.model_selection import cross_val_score
 from xgboost import XGBClassifier
-from data_utils import load_adult_income_data
-
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', )))
+from utils.data_utils import load_adult_income_data
 
 def objective(trial, X_train, y_train):
     """
@@ -26,30 +28,29 @@ def objective(trial, X_train, y_train):
         'max_depth': trial.suggest_int('max_depth', 3, 10),
         'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.3, log=True),
         'n_estimators': trial.suggest_int('n_estimators', 50, 300),
-        'min_child_weight': trial.suggest_int('min_child_weight', 1, 10),
-        'gamma': trial.suggest_float('gamma', 0.0, 0.5),
-        'subsample': trial.suggest_float('subsample', 0.6, 1.0),
-        'colsample_bytree': trial.suggest_float('colsample_bytree', 0.6, 1.0),
-        'reg_alpha': trial.suggest_float('reg_alpha', 0.0, 1.0),
-        'reg_lambda': trial.suggest_float('reg_lambda', 0.0, 1.0),
         'random_state': 42,
         'eval_metric': 'logloss',
-        'use_label_encoder': False,
+        'n_jobs': 1,  # To avoid nested parallelism
     }
     
     # Create XGBoost classifier
     model = XGBClassifier(**param)
     
-    # Perform cross-validation and get mean accuracy
-    scores = cross_val_score(model, X_train, y_train, cv=3, scoring='accuracy', n_jobs=-1)
-    accuracy = scores.mean()
+    # Perform 3 fold cross-validation and get mean accuracy
+    # n_jobs = -1 to use all available cores
+    scores = cross_val_score(model, X_train, y_train, cv=3, scoring='accuracy', n_jobs=-1, error_score='raise')
     
-    # Model complexity (we want to minimize this, so return negative)
-    complexity = -param['n_estimators']
+    # Objective 1:
+    accuracy = scores.mean()
+    # Objective 2:
+    # Model complexity (we want to minimize this)
+    complexity = param['n_estimators']
     
     return accuracy, complexity
 
-
+# Two key concepts for optuna:
+# 1. Study - an optimization session
+# 2. Trial - a single execution of the objective function
 def run_multi_objective_optimization(n_trials=50):
     """
     Run multi-objective optimization study.
@@ -67,7 +68,7 @@ def run_multi_objective_optimization(n_trials=50):
     
     # Create study with two objectives: maximize accuracy, minimize complexity
     study = optuna.create_study(
-        directions=['maximize', 'maximize'],  # maximize accuracy, maximize negative complexity (minimize complexity)
+        directions=['maximize', 'minimize'],  # maximize accuracy, minimize complexity
         study_name='xgboost_multi_objective'
     )
     
@@ -88,7 +89,7 @@ def run_multi_objective_optimization(n_trials=50):
         print(f"\nSolution {i+1}:")
         print(f"  Trial: {trial.number}")
         print(f"  Accuracy: {trial.values[0]:.4f}")
-        print(f"  N_estimators: {-trial.values[1]:.0f}")
+        print(f"  N_estimators: {trial.values[1]:.0f}")
         print(f"  Key parameters:")
         print(f"    - max_depth: {trial.params['max_depth']}")
         print(f"    - learning_rate: {trial.params['learning_rate']:.4f}")
