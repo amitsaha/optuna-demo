@@ -12,7 +12,7 @@ import os
 
 from multi_objective_demo import objective
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', )))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..', )))
 from utils.data_utils import load_adult_income_data, get_dataset_info
 
 # Set page config

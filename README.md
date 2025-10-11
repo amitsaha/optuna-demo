@@ -111,6 +111,14 @@ The following XGBoost hyperparameters are optimized:
 
 ## Key Concepts
 
+### xgboost
+
+Boosting as a team of trees:
+
+1. max_depth: how smart each team member is.
+2. n_estimators: how many team members you have.
+3. learning_rate: how loudly each speaks when forming the final decision.
+
 ### Single-Objective Optimization
 
 In single-objective optimization, we aim to maximize a single metric (accuracy). Optuna explores the hyperparameter space and finds the configuration that yields the best performance.
@@ -119,7 +127,7 @@ In single-objective optimization, we aim to maximize a single metric (accuracy).
 
 In multi-objective optimization, we optimize for multiple competing objectives simultaneously:
 1. **Maximize accuracy**: Better predictive performance
-2. **Minimize complexity**: Fewer trees means faster inference and simpler model
+2. **Minimize complexity**: Fewer trees means faster inference and simpler model ([Reference](https://xgboosting.com/xgboost-model-complexity/))
 
 The result is a Pareto frontier - a set of solutions where improving one objective would require sacrificing another. This allows you to choose the best trade-off for your specific needs.
 
@@ -132,4 +140,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 - [Optuna Documentation](https://optuna.readthedocs.io/en/stable/)
 - [Optuna sampling algorithms](https://deepwiki.com/optuna/optuna/3-sampling-algorithms)
 - [XGBoost Documentation](https://xgboost.readthedocs.io/)
+- XGboost model complexity
+  - https://xgboosting.com/xgboost-model-complexity/
+  - https://codesignal.com/learn/courses/xgboost-for-beginners/lessons/controlling-complexity-and-learning-rate
 - [UCI Adult Income Dataset](https://archive.ics.uci.edu/dataset/2/adult)

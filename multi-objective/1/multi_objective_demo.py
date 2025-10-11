@@ -7,7 +7,7 @@ from sklearn.model_selection import cross_val_score
 from xgboost import XGBClassifier
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', )))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..', )))
 from utils.data_utils import load_adult_income_data
 
 def objective(trial, X_train, y_train):
