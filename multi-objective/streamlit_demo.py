@@ -95,7 +95,7 @@ if st.sidebar.button("🚀 Run Optimization", type="primary"):
     with st.spinner(f"Running multi-objective optimization with {n_trials} trials... This may take a few minutes."):
         study = optuna.create_study(directions=['maximize', 'minimize'])
         study.optimize(
-            lambda trial: objective(trial, X_train, y_train, param_config), 
+            lambda trial: objective(trial, X_train, y_train), 
             n_trials=n_trials,
             show_progress_bar=False
         )
@@ -243,8 +243,7 @@ if 'study' in st.session_state:
                 'Accuracy': f"{trial.values[0]:.4f}",
                 'N_Estimators': int(trial.values[1]),
                 'max_depth': trial.params['max_depth'],
-                'learning_rate': f"{trial.params['learning_rate']:.4f}",
-                'min_child_weight': trial.params['min_child_weight'],
+                'learning_rate': f"{trial.params['learning_rate']:.4f}"
             }
             pareto_solutions.append(solution)
         
