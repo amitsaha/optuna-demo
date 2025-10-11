@@ -139,5 +139,6 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 ## References
 
 - [Optuna Documentation](https://optuna.readthedocs.io/en/stable/)
+- [Optuna sampling algorithms](https://deepwiki.com/optuna/optuna/3-sampling-algorithms)
 - [XGBoost Documentation](https://xgboost.readthedocs.io/)
 - [UCI Adult Income Dataset](https://archive.ics.uci.edu/dataset/2/adult)
