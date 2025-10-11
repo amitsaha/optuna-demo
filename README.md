@@ -8,14 +8,6 @@ The demos showcase:
 1. **Single-Objective Optimization**: Optimizing XGBoost hyperparameters to maximize classification accuracy
 2. **Multi-Objective Optimization**: Finding optimal trade-offs between classification accuracy and model complexity (number of trees)
 
-## Features
-
-- 🎯 Interactive Streamlit web applications
-- 📊 Real-time visualization of optimization progress
-- 🔍 Parameter importance analysis
-- 📈 Pareto frontier visualization for multi-objective optimization
-- 🧪 Test set evaluation
-
 ## Installation
 
 ### Prerequisites
@@ -51,7 +43,6 @@ conda activate optuna-demo
 conda install pip
 ```
 
-``bash
 4. Install dependencies:
 ```bash
 pip install -r requirements.txt
