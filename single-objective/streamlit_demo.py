@@ -110,7 +110,7 @@ if 'study' in st.session_state:
     study = st.session_state['study']
     
     # Create tabs for different visualizations
-    tab1, tab2, tab3, tab4 = st.tabs(["📊 Results", "📈 History", "🎯 Best Parameters", "🧪 Test Evaluation"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Results", "📈 History", "🎯 Best Parameters", "Learning rate/# Trees"])
     
     with tab1:
         st.header("Optimization Results")
@@ -132,7 +132,10 @@ if 'study' in st.session_state:
             if trial.value is not None:
                 trials_data.append({
                     'Trial': trial.number,
-                    'Accuracy': trial.value
+                    'Accuracy': trial.value,
+                    'learning_rate': trial.params.get('learning_rate', None),
+                    'max_depth': trial.params.get('max_depth', None),
+                    'n_estimators': trial.params.get('n_estimators', None),
                 })
         
         df_trials = pd.DataFrame(trials_data)
@@ -208,56 +211,39 @@ if 'study' in st.session_state:
             st.info("Parameter importance calculation requires at least 2 trials.")
     
     with tab4:
-        st.header("Test Set Evaluation")
+        st.header("Learning rate vs Number of Trees Scatter Plot")
         
-        if st.button("Evaluate on Test Set"):
-            with st.spinner("Training final model with best parameters..."):
-                # Train final model
-                best_params = study.best_params.copy()
-                best_params.update({
-                    'random_state': 42,
-                    'eval_metric': 'logloss',
+        # Scatter plot of learning_rate vs n_estimators
+        scatter_data = []
+        for trial in study.trials:
+            if trial.value is not None:
+                scatter_data.append({
+                    'learning_rate': trial.params.get('learning_rate', None),
+                    'n_estimators': trial.params.get('n_estimators', None),
+                    'Accuracy': trial.value
                 })
-                
-                final_model = XGBClassifier(**best_params)
-                final_model.fit(st.session_state['X_train'], st.session_state['y_train'])
-                
-                # Evaluate
-                train_accuracy = final_model.score(st.session_state['X_train'], st.session_state['y_train'])
-                test_accuracy = final_model.score(st.session_state['X_test'], st.session_state['y_test'])
-            
-            st.success("✓ Model evaluation completed!")
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric("Training Accuracy", f"{train_accuracy:.4f}")
-            with col2:
-                st.metric("Test Accuracy", f"{test_accuracy:.4f}")
-            
-            # Feature importance
-            st.subheader("Feature Importance (Top 10)")
-            
-            feature_importance = pd.DataFrame({
-                'Feature': [f'Feature_{i}' for i in range(len(final_model.feature_importances_))],
-                'Importance': final_model.feature_importances_
-            }).sort_values('Importance', ascending=False).head(10)
-            
-            fig_feat = go.Figure()
-            fig_feat.add_trace(go.Bar(
-                x=feature_importance['Importance'],
-                y=feature_importance['Feature'],
-                orientation='h',
-                marker=dict(color='green')
-            ))
-            
-            fig_feat.update_layout(
-                title="Top 10 Most Important Features",
-                xaxis_title="Importance",
-                yaxis_title="Feature",
-                height=400
+        df_scatter = pd.DataFrame(scatter_data)
+        fig_scatter = go.Figure()
+        fig_scatter.add_trace(go.Scatter(
+            x=df_scatter['learning_rate'],
+            y=df_scatter['n_estimators'],
+            mode='markers',
+            marker=dict(
+                size=10,
+                color=df_scatter['Accuracy'],
+                colorscale='Viridis',
+                showscale=True,
+                colorbar=dict(title='Accuracy')
             )
-            
-            st.plotly_chart(fig_feat, use_container_width=True)
+        ))
+        fig_scatter.update_layout(
+            title="Learning Rate vs Number of Trees",
+            xaxis_title="Learning Rate",
+            yaxis_title="Number of Trees (n_estimators)",
+            height=500
+        )
+        st.plotly_chart(fig_scatter, use_container_width=True)
+
 
 else:
     st.info("👈 Configure parameters in the sidebar and click 'Run Optimization' to start!")
