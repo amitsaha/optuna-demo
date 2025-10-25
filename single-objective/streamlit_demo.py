@@ -242,6 +242,27 @@ if 'study' in st.session_state:
             yaxis_title="Number of Trees (n_estimators)",
             height=500
         )
+        # Highlight the best learning rate and number of trees and mark it on the scatter
+        best_lr = None
+        best_n_est = None
+        try:
+            best_lr = study.best_params.get('learning_rate')
+            best_n_est = study.best_params.get('n_estimators')
+        except Exception:
+            pass
+
+        # Add a highlighted marker for the best point on the scatter (if both values are available)
+        if best_lr is not None and best_n_est is not None:
+            fig_scatter.add_annotation(
+                x=best_lr,
+                y=best_n_est,
+                text="Best",
+                showarrow=True,
+                arrowhead=2,
+                ax=40,
+                ay=-40,
+                bgcolor='rgba(255,255,255,0.8)'
+            )
         st.plotly_chart(fig_scatter, use_container_width=True)
 
 
