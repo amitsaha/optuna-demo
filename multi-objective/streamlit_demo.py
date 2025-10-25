@@ -12,7 +12,7 @@ import os
 
 from multi_objective_demo import objective
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..', )))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../', )))
 from utils.data_utils import load_adult_income_data, get_dataset_info
 
 # Set page config
@@ -173,9 +173,9 @@ if 'study' in st.session_state:
         ))
         
         fig.update_layout(
-            title="Pareto Frontier: Accuracy vs Model Complexity",
-            xaxis_title="Max depth (Complexity)",
-            yaxis_title="Accuracy",
+            title="Pareto Frontier: ROC-AUC vs Model Complexity",
+            xaxis_title="Complexity",
+            yaxis_title="ROC-AUC (Accuracy)",
             hovermode='closest',
             height=600,
             showlegend=True

@@ -2,20 +2,15 @@
 Multi-objective optimization demo using Optuna with XGBoost on UCI Adult Income dataset.
 This demo optimizes for both accuracy and model size (number of trees).
 """
-import numpy as np
 import optuna
-from sklearn.metrics import log_loss, make_scorer
-from sklearn.model_selection import cross_validate
+from sklearn.model_selection import cross_val_score
 from xgboost import XGBClassifier
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..', )))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../', )))
 from utils.data_utils import load_adult_income_data
-
-scorers = {
-    "accuracy": "accuracy",
-    "neg_log_loss": make_scorer(log_loss, greater_is_better=False),
-}
+from sklearn.model_selection import cross_validate
+from sklearn.model_selection import cross_val_score
 
 def objective(trial, X_train, y_train):
     """
@@ -43,29 +38,19 @@ def objective(trial, X_train, y_train):
     # Create XGBoost classifier
     model = XGBClassifier(**param)
     
-    cv_results = cross_validate(
-        model,
-        X_train,
-        y_train,
-        cv=3,
-        scoring=scorers,
-        return_train_score=True,
-        n_jobs=-1,
-    )
-
-    # Objective 1: maximize accuracy
-    mean_acc = np.mean(cv_results["test_accuracy"])
-
-    train_loss = -cv_results["train_neg_log_loss"]
-    val_loss = -cv_results["test_neg_log_loss"]
-    # Objective 2: minimize generalization gap (val_loss - train_loss)
-    mean_gap = np.mean(val_loss - train_loss)
-    # # Store train_loss and val_loss for later plotting
-    # trial.set_user_attr("train_loss", train_loss.tolist())
-    # trial.set_user_attr("val_loss", val_loss.tolist())
-    trial.set_user_attr("generalization_gap", mean_gap )
     
-    return mean_acc, mean_gap
+    # Objective 1:
+    # Compute AUC via cross_val_score (uses predict_proba internally)
+    auc_scores = cross_val_score(
+        model, X_train, y_train, cv=3, scoring='roc_auc', n_jobs=-1, error_score='raise'
+    )
+    val_auc = auc_scores.mean()
+    performance = val_auc
+
+    # Better complexity proxy: reflect both number of trees and tree size (trees * depth)
+    complexity = param['n_estimators'] * param['max_depth']
+
+    return performance, complexity
 
 # Two key concepts for optuna:
 # 1. Study - an optimization session
@@ -87,7 +72,7 @@ def run_multi_objective_optimization(n_trials=50):
     
     # Create study with two objectives: maximize accuracy, minimize complexity
     study = optuna.create_study(
-        directions=['maximize', 'minimize'],  # maximize accuracy, minimize generalization gap
+        directions=['maximize', 'minimize'],  # maximize accuracy, minimize complexity
         study_name='xgboost_multi_objective'
     )
     
@@ -107,8 +92,8 @@ def run_multi_objective_optimization(n_trials=50):
     for i, trial in enumerate(study.best_trials):
         print(f"\nSolution {i+1}:")
         print(f"  Trial: {trial.number}")
-        print(f"  Accuracy: {trial.values[0]:.4f}")
-        print(f"  N_estimators: {trial.values[1]:.0f}")
+        print(f"  ROC-AUC: {trial.values[0]:.4f}")
+        print(f"  N_estimators*max_depth: {trial.values[1]:.0f}")
         print(f"  Key parameters:")
         print(f"    - max_depth: {trial.params['max_depth']}")
         print(f"    - learning_rate: {trial.params['learning_rate']:.4f}")
@@ -125,9 +110,8 @@ def run_multi_objective_optimization(n_trials=50):
         selected_trial = sorted_trials[median_idx]
         
         print(f"Selected trial: {selected_trial.number}")
-        print(f"Accuracy: {selected_trial.values[0]:.4f}")
-        print(f"N_estimators: {selected_trial.values[1]:.0f}" )
-        print(f"Generalization gap: {selected_trial.user_attrs['generalization_gap']:.4f}" )
+        print(f"ROC AUC: {selected_trial.values[0]:.4f}")
+        print(f"Complexity: {selected_trial.values[1]:.0f}")
         
         # Train final model with selected parameters
         print("\nTraining final model with selected parameters...")
