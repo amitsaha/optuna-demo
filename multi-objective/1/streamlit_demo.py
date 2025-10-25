@@ -32,7 +32,7 @@ with **XGBoost** on the **UCI Adult Income** dataset.
 
 The goals are to:
 1. **Maximize classification accuracy**
-2. **Minimize model complexity** (number of trees/estimators)
+2. **Minimize model complexity** (max depth for each tree)
 
 This creates a Pareto frontier of optimal trade-offs between accuracy and model simplicity.
 """)
@@ -174,7 +174,7 @@ if 'study' in st.session_state:
         
         fig.update_layout(
             title="Pareto Frontier: Accuracy vs Model Complexity",
-            xaxis_title="Number of Estimators (Complexity)",
+            xaxis_title="Max depth (Complexity)",
             yaxis_title="Accuracy",
             hovermode='closest',
             height=600,

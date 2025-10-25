@@ -43,8 +43,9 @@ def objective(trial, X_train, y_train):
     # Objective 1:
     accuracy = scores.mean()
     # Objective 2:
-    # Model complexity (we want to minimize this)
-    complexity = param['n_estimators']
+    # Model complexity (we want to minimize this while capturing the data well)
+    # https://xgboosting.com/configure-xgboost-max_depth-parameter/
+    complexity = param['max_depth']
     
     return accuracy, complexity
 
