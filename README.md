@@ -99,8 +99,6 @@ The demos use the **UCI Adult Income** dataset, which is automatically downloade
 - **Target**: Binary classification (income >50K or ≤50K)
 - **Samples**: ~48,000
 
-**Note**: If the UCI ML Repository is unavailable, the demos will automatically use a synthetic dataset with similar characteristics for demonstration purposes.
-
 ## Hyperparameters Tuned
 
 The following XGBoost hyperparameters are optimized:
@@ -126,7 +124,7 @@ In single-objective optimization, we aim to maximize a single metric (accuracy).
 ### Multi-Objective Optimization
 
 In multi-objective optimization, we optimize for multiple competing objectives simultaneously:
-1. **Maximize accuracy**: Better predictive performance
+1. **Maximize AUC-ROC**: Better predictive performance
 2. **Minimize complexity**: Fewer trees means faster inference and simpler model ([Reference](https://xgboosting.com/xgboost-model-complexity/))
 
 The result is a Pareto frontier - a set of solutions where improving one objective would require sacrificing another. This allows you to choose the best trade-off for your specific needs.
