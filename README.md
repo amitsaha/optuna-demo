@@ -1,5 +1,7 @@
 # Optuna Hyperparameter Optimization Demos
 
+![Pareto Front](./multi_objective_pareto_front.png)
+
 This repository contains demonstrations of using [Optuna](https://optuna.readthedocs.io/en/stable/index.html) for hyperparameter tuning with XGBoost on the UCI Adult Income dataset.
 
 ## Overview
